@@ -15,6 +15,10 @@ A Fortnite C++ tool that allows the user to use Performance Mode/DirectX 11 inst
   
 ![Screenshot 2024-06-15 013516](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/68ee292e-a705-4d8c-9cca-da7a9dc0857f)
 
+# Usage
+To use it or adapt it to your needs, you must change the version and download URL(s).
+
+
 <!-- LICENSE -->
 ## License
 
