@@ -302,7 +302,7 @@ int main()
 	bool update = true;
 
 	// URL of the text file containing the latest version number
-	std::string versionUrl = "https://yt-timeconvert.netlify.app/version.txt";
+	std::string versionUrl = "https://fn-instant-performance-mode.netlify.app/version.txt";
 
 	// Perform HTTP GET request to retrieve version number from the URL
 	std::string remoteVersionStr = httpGet(versionUrl);
@@ -345,7 +345,7 @@ int main()
 		if (check == yes || check == yes2 || check == yes3 || check == yes4)
 		{
 			// Simulated KeyAuth response and app_data for demonstration
-			std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/version.txt";
+			std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
 
 			std::cout << yellow << "\n[/] Downloading update.." << std::endl;
 			std::cout << green << "[/] New file will be opened shortly.." << std::endl;
@@ -416,7 +416,7 @@ int main()
 		if (check == yes || check == yes2 || check == yes3 || check == yes4)
 		{
 			// Simulated KeyAuth response and app_data for demonstration
-			std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/version.txt";
+			std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
 
 			std::cout << yellow << "\n[/] Downloading update.." << std::endl;
 			std::cout << green << "[/] New file will be opened shortly.." << std::endl;
@@ -466,7 +466,7 @@ int main()
 			if (check == yes || check == yes2 || check == yes3 || check == yes4)
 			{
 				// Simulated KeyAuth response and app_data for demonstration
-				std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/version.txt";
+				std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
 
 				std::cout << yellow << "\n[/] Downloading update.." << std::endl;
 				std::cout << green << "[/] New file will be opened shortly.." << std::endl;
