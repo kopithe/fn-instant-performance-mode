@@ -14,3 +14,8 @@ A Fortnite C++ tool that allows the user to use Performance Mode/DirectX 11 inst
 - If the version does not match and the user wants to download the file, the file will be downloaded and run from the path where the user ran the old, outdated file and then the old file will be deleted
   
 ![Screenshot 2024-06-15 013516](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/68ee292e-a705-4d8c-9cca-da7a9dc0857f)
+
+<!-- LICENSE -->
+## License
+
+We use the MIT license. For more information, please read the LICENSE file.
