@@ -514,24 +514,19 @@ void viewChangelogs() {
 				continue; // Skip empty lines
 			}
 
-			char prefix = line[0];
 			const std::string* color = &reset; // Default color
 
-			switch (prefix) {
-			case '+':
+			if (line.compare(0, 3, "[+]") == 0) {
 				color = &green;
-				break;
-			case '-':
+			}
+			else if (line.compare(0, 3, "[-]") == 0) {
 				color = &red;
-				break;
-			case '?':
+			}
+			else if (line.compare(0, 3, "[?]") == 0) {
 				color = &yellow;
-				break;
-			case 'V':
+			}
+			else if (line.compare(0, 1, "V") == 0) {
 				color = &pink;
-				break;
-			default:
-				break;
 			}
 
 			std::cout << *color << line << reset << std::endl;
