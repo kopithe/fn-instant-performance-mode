@@ -26,9 +26,10 @@ A powerful Fortnite C++ tool that allows users to launch Fortnite using Performa
 ### 🛡️ Hash Checker
 
 - 🆕 **New Feature**: Added a server-side hash checker that verifies the integrity of the user's files.
+![Screenshot 2024-06-15 103158](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/535aaa11-abd4-433a-8313-a75aec59720c)
+![Screenshot 2024-06-15 103238](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/da246de0-8a62-4e15-bb3c-dec529bf27bc)
 
-![Screenshot 2024-06-15 090308](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/7e45a37f-38d8-41f3-9f89-cc6711f8ceb2)
-![Screenshot 2024-06-15 090253](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/021298a5-52aa-4c2a-bd0a-e3fa2b90c926)
+
 
 ### How to Use
 
