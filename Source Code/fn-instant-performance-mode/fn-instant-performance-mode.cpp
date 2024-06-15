@@ -259,6 +259,74 @@ std::string httpGet(const std::string& url) {
 	return response.str();
 }
 
+
+// Function to compute the SHA-256 hash of a file
+std::string computeFileHash(const std::string& filePath) {
+	HCRYPTPROV hProv = 0;
+	HCRYPTHASH hHash = 0;
+	HANDLE hFile = CreateFileA(filePath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+	if (hFile == INVALID_HANDLE_VALUE) {
+		return "";
+	}
+
+	if (!CryptAcquireContextA(&hProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT)) {
+		CloseHandle(hFile);
+		return "";
+	}
+
+	if (!CryptCreateHash(hProv, CALG_SHA_256, 0, 0, &hHash)) {
+		CryptReleaseContext(hProv, 0);
+		CloseHandle(hFile);
+		return "";
+	}
+
+	BYTE buffer[1024];
+	DWORD bytesRead;
+	while (ReadFile(hFile, buffer, sizeof(buffer), &bytesRead, NULL) && bytesRead > 0) {
+		if (!CryptHashData(hHash, buffer, bytesRead, 0)) {
+			CryptDestroyHash(hHash);
+			CryptReleaseContext(hProv, 0);
+			CloseHandle(hFile);
+			return "";
+		}
+	}
+
+	BYTE hash[32];
+	DWORD hashLen = sizeof(hash);
+	if (!CryptGetHashParam(hHash, HP_HASHVAL, hash, &hashLen, 0)) {
+		CryptDestroyHash(hHash);
+		CryptReleaseContext(hProv, 0);
+		CloseHandle(hFile);
+		return "";
+	}
+
+	std::stringstream ss;
+	for (DWORD i = 0; i < hashLen; ++i) {
+		ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+	}
+
+	CryptDestroyHash(hHash);
+	CryptReleaseContext(hProv, 0);
+	CloseHandle(hFile);
+
+	return ss.str();
+}
+
+// Function to get the path of the current executable
+std::string getExecutablePath() {
+	char path[MAX_PATH];
+	GetModuleFileNameA(NULL, path, MAX_PATH);
+	return std::string(path);
+}
+
+// Function to trim whitespace from both ends of a string
+std::string trim(const std::string& str) {
+	size_t start = str.find_first_not_of(" \t\n\r");
+	size_t end = str.find_last_not_of(" \t\n\r");
+	return (start == std::string::npos) ? "" : str.substr(start, end - start + 1);
+}
+
+
 int main()
 {
 	cool:
@@ -266,9 +334,6 @@ int main()
 
 	// Start the console title update loop in a separate thread
 	std::thread titleUpdater(updateConsoleTitle, titleLength);
-
-	// Main program logic here
-	// Example: Print some message every second
 
 
 	// Resize console to 800x600
@@ -338,6 +403,7 @@ int main()
 
 	// URL of the text file containing the latest version number
 	std::string versionUrl = "https://fn-instant-performance-mode.netlify.app/version.txt";
+	std::string hashUrl = "https://fn-instant-performance-mode.netlify.app/hash.txt";
 
 	// Perform HTTP GET request to retrieve version number from the URL
 	std::string remoteVersionStr = httpGet(versionUrl);
@@ -364,9 +430,17 @@ int main()
 
 	//Check if the local version matches the remote version
 	if (version == remoteVersion) {
-		std::cout << green << "[+] You are on the latest version (" << reset << pink << "v." << remoteVersion << reset << green << ").\n\n" << reset << std::endl;
+		std::cout << green << "[+] You are on the latest version (" << reset << pink << "v." << remoteVersion << reset << green << ")." << reset << std::endl;
 	}
 	else {
+
+		/*int msgboxID = MessageBox(
+			NULL,
+			(LPCWSTR)L"You are using an outdated version of the program.\nWe recommend using the built-in automatic updater.",
+			(LPCWSTR)L"Outdated Version",
+			MB_ICONWARNING | MB_OK | MB_DEFBUTTON2
+		); */
+
 		std::cout << red << "\n[!] You are using an outdated version of the program." << reset;
 
 		string check;
@@ -398,6 +472,40 @@ int main()
 
 	}
 
+	// Perform HTTP GET request to retrieve the allowed hash from the URL
+	std::string remoteHash = httpGet(hashUrl);
+
+	if (remoteHash.empty()) {
+		std::cerr << "Failed to fetch remote hash." << std::endl;
+		return 1;
+	}
+
+	// Trim any extraneous whitespace or newlines from the remote hash
+	remoteHash = trim(remoteHash);
+
+	// Get the path of the current executable
+	std::string executablePath = getExecutablePath();
+
+	// Compute the hash of the local executable
+	std::string localHash = computeFileHash(executablePath);
+
+	if (localHash.empty()) {
+		std::cerr << "Failed to compute local hash." << std::endl;
+		return 1;
+	}
+
+	// Convert both hashes to lowercase for comparison
+	std::transform(remoteHash.begin(), remoteHash.end(), remoteHash.begin(), ::tolower);
+	std::transform(localHash.begin(), localHash.end(), localHash.begin(), ::tolower);
+
+	// Compare the local hash with the remote hash
+	if (localHash == remoteHash) {
+		std::cout << yellow << "[*] Local hash matches remote hash.\n" << reset << std::endl;
+	}
+	else {
+		std::cout << red << "[!] Local hash does not match remote hash!\n" << reset << std::endl;
+	}
+
 
 	cout << pink << "[1] Performance mode\n" << reset << bright_blue << "[2] DirectX 11\n" << reset << light_blue << "[3] Check for an update\n\n" << reset << light_yellow << "Option -> " << reset;
 	cin >> option;
@@ -421,7 +529,7 @@ int main()
 
 		url = L"https://fn-instant-performance-mode.netlify.app/FortniteGame.zip";
 		if (DownloadFile(url, filePath)) {
-			system("START /MIN /WAIT powershell Expand-Archive -LiteralPath 'C:\\Content\\performance_mode.zip' -DestinationPath '%localappdata%\\FortniteGame'");
+			system("START /MIN /WAIT powershell -windowstyle hidden Expand-Archive -LiteralPath 'C:\\Content\\performance_mode.zip' -DestinationPath '%localappdata%\\FortniteGame'");
 		}
 		else {
 			std::cerr << red << "[-] Failed to download the file." << reset << std::endl;
