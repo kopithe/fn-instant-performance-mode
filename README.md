@@ -22,6 +22,12 @@ A Fortnite C++ tool that allows the user to use Performance Mode/DirectX 11 inst
 ![Screenshot 2024-06-15 090308](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/7e45a37f-38d8-41f3-9f89-cc6711f8ceb2)
 ![Screenshot 2024-06-15 090253](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/021298a5-52aa-4c2a-bd0a-e3fa2b90c926)
 
+### How to use
+Open a Powershell terminal and type `Get-FileHash` followed by the path of the executable. To get the path, you can drag and drop the executable into the Powershell terminal. Example: `Get-FileHash C:\Source\example.exe`.
+Powershell results: `Algorithm       Hash                                                                   Path<br />
+---------       ----                                                                   ----<br />
+SHA256          exampleHash189764UAJb       C:\Source\example.exe`
+
 
 # Updates
 As Fortnite makes updates that also change the trailers, I will try to keep updating this to the latest game patch!
