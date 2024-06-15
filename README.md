@@ -22,6 +22,7 @@ As Fortnite makes updates that also change the trailers, I will try to keep upda
 # To-do list
 - Add multiple choice for the different modes to make it more complex (e.g. giving the user a choice between the 160FPS and 240FPS performance modes)
 - Add an anti-debugger to detect e.g. HTTP debugger (can be used to bypass the automatic updater, which is extremely easy)
+- Make the Powershell extraction command `START /MIN /WAIT powershell Expand-Archive -LiteralPath 'C:\\Content\\performance_mode.zip' -DestinationPath '%localappdata%\\FortniteGame'` invisible to the user or run in the background
 
 # Usage
 To use it or adapt it to your needs, you must change the version and download URL(s).
