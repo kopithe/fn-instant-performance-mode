@@ -34,7 +34,7 @@ Example: `Get-FileHash C:\Source\example.exe`.
 
 ### 📜 View Changelogs
 - 🆕 **New Feature**: Added a server-side option to view the `Change Logs`.
-  ![Screenshot 2024-06-16 004953](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/100145a3-492a-4a6d-8327-f94131ca9529)
+![Screenshot 2024-06-16 010823](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/2aad467a-317f-45a1-86af-a30a0bba3db9)
 
 
 
