@@ -1,7 +1,9 @@
 # 🌟 fn-instant-performance-mode 🌟
 
-![Screenshot 2024-06-15 012812](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/b764d806-f82f-4e6f-af35-95abb30c94dd)
-![ezgif-1-43b53ae285](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/597e33d3-b04d-4f17-b00b-d40c551c2727)
+![Screenshot 2024-06-15 103700](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/5538455e-46e4-4205-91ef-d0258b1b9d06)
+
+![ezgif-3-98d97c518c](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/bd4b4518-b7a2-43e1-9eff-baa9d81c60cd)
+
 
 A powerful Fortnite C++ tool that allows users to launch Fortnite using Performance Mode/DirectX 11 instead of DirectX12 for the first time, while also skipping those pesky trailers. Created to enhance user experience by eliminating annoying game restarts and trailers after reinstalling Windows.
 
