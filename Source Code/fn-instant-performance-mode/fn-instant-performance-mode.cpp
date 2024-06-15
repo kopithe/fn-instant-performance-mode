@@ -326,379 +326,167 @@ std::string trim(const std::string& str) {
 	return (start == std::string::npos) ? "" : str.substr(start, end - start + 1);
 }
 
+const std::vector<std::string> blacklistedTools = {
+		"ollydbg.exe", "idaq.exe", "idaq64.exe", "idag.exe", "idag64.exe",
+		"ida.exe", "ida64.exe", "idaq.exe", "idaq64.exe", "ImmunityDebugger.exe",
+		"Wireshark.exe", "dumpcap.exe", "HookExplorer.exe", "ImportREC.exe",
+		"PETools.exe", "LordPE.exe", "SysInspector.exe", "Procmon.exe", "Procexp.exe",
+		"idaq64.exe", "idaq.exe", "ollydbg.exe", "x64dbg.exe", "x32dbg.exe",
+		"scylla.exe", "scylla_x64.exe", "scylla_x86.exe", "scylla.dll",
+		"scylla_x64.dll", "scylla_x86.dll", "windbg.exe", "reshacker.exe",
+		"ImportREC.exe", "IMMUNITYDEBUGGER.EXE", "MegaDumper.exe", "MegaDumper_x64.exe"
+	"ollydbg.exe",
+	"idaq.exe",
+	"idaq64.exe",
+	"idag.exe",
+	"idag64.exe",
+	"idaw.exe",
+	"idaw64.exe",
+	"ida.exe",
+	"ida64.exe",
+	"ImmunityDebugger.exe",
+	"Wireshark.exe",
+	"dumpcap.exe",
+	"HookExplorer.exe",
+	"ImportREC.exe",
+};
+
+#include <psapi.h>
+
+
+bool isBlacklistedToolRunning() {
+	DWORD processIds[1024], cbNeeded, cProcesses;
+	if (!EnumProcesses(processIds, sizeof(processIds), &cbNeeded))
+		return false;
+
+	cProcesses = cbNeeded / sizeof(DWORD);
+
+	for (unsigned int i = 0; i < cProcesses; i++) {
+		if (processIds[i] != 0) {
+			char szProcessName[MAX_PATH] = "<unknown>";
+			HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processIds[i]);
+
+			if (hProcess != NULL) {
+				HMODULE hMod;
+				DWORD cbNeeded;
+
+				if (EnumProcessModules(hProcess, &hMod, sizeof(hMod), &cbNeeded)) {
+					GetModuleBaseNameA(hProcess, hMod, szProcessName, sizeof(szProcessName) / sizeof(char));
+
+					for (const auto& blacklisted : blacklistedTools) {
+						if (_stricmp(szProcessName, blacklisted.c_str()) == 0) {
+							//std::cerr << "Blacklisted tool detected: " << szProcessName << std::endl;
+							CloseHandle(hProcess);
+							return true;
+						}
+					}
+				}
+				CloseHandle(hProcess);
+			}
+		}
+	}
+	return false;
+}
+
+
+std::string generateRandomString121(int length) {
+	const std::string charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	std::string result;
+	result.reserve(length);
+	for (int i = 0; i < length; ++i) {
+		result += charset[rand() % charset.length()];
+	}
+	return result;
+}
+
+// Function to generate a random error message
+std::string generateRandomErrorMessage() {
+	std::string errorCode = generateRandomString121(7); // Generating a random code
+	return "[!] Error: FlX -> (" + errorCode + ")";
+}
+
+// Function to check if a software is blacklisted (dummy implementation)
+bool isSoftwareBlacklisted() {
+	// Simulate checking for blacklisted software (replace with actual logic)
+	static bool blacklisted = false;
+	blacklisted = !blacklisted; // Toggle for testing
+	return blacklisted;
+}
+
 
 int main()
 {
-	cool:
-	const int titleLength = 40;
-
-	// Start the console title update loop in a separate thread
-	std::thread titleUpdater(updateConsoleTitle, titleLength);
-
-
-	// Resize console to 800x600
-	resizeConsole(800, 400);
-
-
-
-	system("cls");
-
-
-	const std::string black = "\033[30m";
-	const std::string red = "\033[31m";
-	const std::string green = "\033[32m";
-	const std::string yellow = "\033[33m";
-	const std::string blue = "\033[34m";
-	const std::string magenta = "\033[35m";
-	const std::string cyan = "\033[36m";
-	const std::string white = "\033[37m";
-
-	const std::string bright_black = "\033[90m";
-	const std::string bright_red = "\033[91m";
-	const std::string bright_green = "\033[92m";
-	const std::string bright_yellow = "\033[93m";
-	const std::string bright_blue = "\033[94m";
-	const std::string bright_magenta = "\033[95m";
-	const std::string bright_cyan = "\033[96m";
-	const std::string bright_white = "\033[97m";
-
-	const std::string bg_black = "\033[40m";
-	const std::string bg_red = "\033[41m";
-	const std::string bg_green = "\033[42m";
-	const std::string bg_yellow = "\033[43m";
-	const std::string bg_blue = "\033[44m";
-	const std::string bg_magenta = "\033[45m";
-	const std::string bg_cyan = "\033[46m";
-	const std::string bg_white = "\033[47m";
-
-	const std::string bg_bright_black = "\033[100m";
-	const std::string bg_bright_red = "\033[101m";
-	const std::string bg_bright_green = "\033[102m";
-	const std::string bg_bright_yellow = "\033[103m";
-	const std::string bg_bright_blue = "\033[104m";
-	const std::string bg_bright_magenta = "\033[105m";
-	const std::string bg_bright_cyan = "\033[106m";
-	const std::string bg_bright_white = "\033[107m";
-
-	const std::string light_yellow = "\033[93m"; // Light yellow
-	const std::string light_blue = "\033[96m"; // Light blue
-	const std::string pink = "\033[95m";
-
-	const std::string reset = "\033[0m";
-
-
-
-
-
-	cout << red << "[!] A stable internet connection is required for this." << reset;
-	Sleep(1500);
-	system("cls");
-
-	double version = 1.1; // Use double for version to match remote version type
-	bool update = true;
-
-	// URL of the text file containing the latest version number
-	std::string versionUrl = "https://fn-instant-performance-mode.netlify.app/version.txt";
-	std::string hashUrl = "https://fn-instant-performance-mode.netlify.app/hash.txt";
-
-	// Perform HTTP GET request to retrieve version number from the URL
-	std::string remoteVersionStr = httpGet(versionUrl);
-
-	if (remoteVersionStr.empty()) {
-		std::cerr << red << "[!] Failed to fetch remote version number." << reset << std::endl;
-		return 1;
-	}
-
-	// Parse the version number from the response
-	double remoteVersion;
-	std::istringstream iss(remoteVersionStr);
-	if (!(iss >> remoteVersion)) {
-		std::cerr << red << "[!] Failed to parse remote version number." << reset << std::endl;
-		return 1;
-	}
-	// Compare local version with remote version
-	if (version >= remoteVersion) {
-		update = false;
-	}
-	else {
-		update = true;
-	}
-
-	//Check if the local version matches the remote version
-	if (version == remoteVersion) {
-		std::cout << green << "[+] You are on the latest version (" << reset << pink << "v." << remoteVersion << reset << green << ")." << reset << std::endl;
-	}
-	else {
-
-		/*int msgboxID = MessageBox(
-			NULL,
-			(LPCWSTR)L"You are using an outdated version of the program.\nWe recommend using the built-in automatic updater.",
-			(LPCWSTR)L"Outdated Version",
-			MB_ICONWARNING | MB_OK | MB_DEFBUTTON2
-		); */
-
-		std::cout << red << "\n[!] You are using an outdated version of the program." << reset;
-
-		string check;
-		string yes = "Y";
-		string yes3 = "y";
-		string yes2 = "yes";
-		string yes4 = "Yes";
-		cout << light_yellow << "\n\n[?] Would you like to try the latest version (Y/N) -> " << reset;
-		cin >> check;
-
-		if (check == yes || check == yes2 || check == yes3 || check == yes4)
-		{
-			// Simulated KeyAuth response and app_data for demonstration
-			std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
-
-			std::cout << yellow << "\n[/] Downloading update.." << std::endl;
-			std::cout << green << "[/] New file will be opened shortly.." << std::endl;
-
-			if (!downloadLink.empty()) {
-				auto_update(downloadLink);
-			}
-		}
-		else
-		{
-			cout << red << "[-] Auto closing in 3 seconds..." << reset;
-			Sleep(3000);
-			exit(0);
-		}
-
-	}
-
-	// Perform HTTP GET request to retrieve the allowed hash from the URL
-	std::string remoteHash = httpGet(hashUrl);
-
-	if (remoteHash.empty()) {
-		std::cerr << "Failed to fetch remote hash." << std::endl;
-		return 1;
-	}
-
-	// Trim any extraneous whitespace or newlines from the remote hash
-	remoteHash = trim(remoteHash);
-
-	// Get the path of the current executable
-	std::string executablePath = getExecutablePath();
-
-	// Compute the hash of the local executable
-	std::string localHash = computeFileHash(executablePath);
-
-	if (localHash.empty()) {
-		std::cerr << "Failed to compute local hash." << std::endl;
-		return 1;
-	}
-
-	// Convert both hashes to lowercase for comparison
-	std::transform(remoteHash.begin(), remoteHash.end(), remoteHash.begin(), ::tolower);
-	std::transform(localHash.begin(), localHash.end(), localHash.begin(), ::tolower);
-
-	// Compare the local hash with the remote hash
-	if (localHash == remoteHash) {
-		std::cout << yellow << "[*] Local hash matches remote hash.\n" << reset << std::endl;
-	}
-	else {
-		std::cout << red << "[!] Local hash does not match remote hash!\n" << reset << std::endl;
-	}
-
-	int option;
-	int option1 = 1;
-	int option2 = 2;
-	int option3 = 3;
-	int option4 = 4;
-	int option5 = 5;
-
-	cout << pink << "[1] Performance mode\n" << reset << bright_blue << "[2] DirectX 11\n" << reset << light_blue << "[3] DirectX 12\n" << reset << yellow << "[4] Check for an update\n" << reset << green << "[5] Exit\n\n" << reset << light_yellow << "Option -> " << reset;
-	cin >> option;
-
-	if (option == option1)
-	{
-		// Path of the directory to create
-		const wchar_t* path = L"C:\\Content";
-
-		// Create the directory
-		if (CreateDirectory(path, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) {
-			//std::wcout << L"Directory created successfully: " << path << std::endl;
-		}
-		else {
-			std::cerr << red << "[-] Failed to create directory: " << path << std::endl;
-		}
-
-		std::wstring url;
-		std::wstring filePath = L"C:\\Content\\performance_mode.zip";
-		std::cout << yellow << "\n[+] Downloading content, please wait...\n\n" << reset;
-
-		url = L"https://fn-instant-performance-mode.netlify.app/FortniteGame.zip";
-		if (DownloadFile(url, filePath)) {
-			system("START /MIN /WAIT powershell -windowstyle hidden Expand-Archive -LiteralPath 'C:\\Content\\performance_mode.zip' -DestinationPath '%localappdata%\\FortniteGame'");
-		}
-		else {
-			std::cerr << red << "[-] Failed to download the file." << reset << std::endl;
-		}
-
-		cout << yellow << "[+] Cleaning up...\n" << reset;
-		system("del C:\\Content\\performance_mode.zip");
-		system("rmdir /q C:\\Content\\");
-		cout << green << "\n[+] Finished" << reset << endl;
-		cout << bright_blue << "[+] Auto closing in 3 seconds..." << reset;
-		Sleep(3000);
-		exit(0);
-
-	}
-
-	if (option == option2)
-	{
-		string check;
-		string yes = "Y";
-		string yes3 = "y";
-		string yes2 = "yes";
-		string yes4 = "Yes";
-		cout << red << "\n[-] We're sorry, but this is not available on your current version (" << reset << pink << "Version " << version << reset << red << ")." << reset << yellow << "\n[/] This feature may be available in later versions (" << light_blue << "Version " << version + 0.1 << " or higher" << yellow << ")." << reset;
-		cout << light_yellow << "\n\n[?] Want to check if updates are available? (Y/N) -> " << reset;
-		cin >> check;
-
-		if (check == yes || check == yes2 || check == yes3 || check == yes4)
-		{
-
-		
-
-		// URL of the text file containing the latest version number
-		std::string versionUrl = "https://fn-instant-performance-mode.netlify.app/version.txt";
-
-
-		// Perform HTTP GET request to retrieve version number from the URL
-		std::string remoteVersionStr = httpGet(versionUrl);
-
-		if (remoteVersionStr.empty()) {
-			std::cerr << red << "[!] Failed to fetch remote version number." << reset << std::endl;
-			return 1;
-		}
-
-		// Parse the version number from the response
-		double remoteVersion;
-		std::istringstream iss(remoteVersionStr);
-		if (!(iss >> remoteVersion)) {
-			std::cerr << red << "[!] Failed to parse remote version number." << reset << std::endl;
-			return 1;
-		}
-		// Compare local version with remote version
-		if (version >= remoteVersion) {
-			update = false;
-		}
-		else {
-			update = true;
-		}
-
-		//Check if the local version matches the remote version
-		if (version == remoteVersion) {
-			std::cout << green << "[+] You are on the latest version (" << reset << pink << "v." << remoteVersion << reset << green << ")." << reset << std::endl;
-			cout << magenta << "\n[!] It is possible that there are some hotfixes on the server without version changes.\n[?] Do you want to download the latest version (Y/N) -> ";
-
-			string instupdate;
-			string yes = "Y";
-			string yes3 = "y";
-			string yes2 = "yes";
-			string yes4 = "Yes";
-			cin >> instupdate;
-
-			if (instupdate == yes || instupdate == yes2 || instupdate == yes3 || instupdate == yes4)
-			{
-				// Simulated KeyAuth response and app_data for demonstration
-				std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
-
-				std::cout << yellow << "\n[/] Downloading update.." << std::endl;
-				std::cout << green << "[/] New file will be opened shortly.." << std::endl;
-
-				if (!downloadLink.empty()) {
-					auto_update(downloadLink);
-				}
-				cout << red << "[-] Auto closing in 3 seconds..." << reset;
-				Sleep(3000);
-				exit(0);
-			}
-
-			else
-			{
-				cout << red << "[-] Auto closing in 3 seconds..." << reset;
-				Sleep(3000);
-				exit(0);
-			}
-
-		}
-
-		}
-		if (update == true) {
-
-			/*int msgboxID = MessageBox(
-				NULL,
-				(LPCWSTR)L"You are using an outdated version of the program.\nWe recommend using the built-in automatic updater.",
-				(LPCWSTR)L"Outdated Version",
-				MB_ICONWARNING | MB_OK | MB_DEFBUTTON2
-			); */
-
-			std::cout << red << "\n[!] You are using an outdated version of the program." << reset;
-
-			string check;
-			string yes = "Y";
-			string yes3 = "y";
-			string yes2 = "yes";
-			string yes4 = "Yes";
-			cout << yellow << "\n\n[?] Would you like to try the latest version (Y/N) -> " << reset;
-			cin >> check;
-
-			if (check == yes || check == yes2 || check == yes3 || check == yes4)
-			{
-				// Simulated KeyAuth response and app_data for demonstration
-				std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
-
-				std::cout << yellow << "\n[/] Downloading update.." << std::endl;
-				std::cout << green << "[/] New file will be opened shortly.." << std::endl;
-
-				if (!downloadLink.empty()) {
-					auto_update(downloadLink);
-				}
-				cout << red << "[-] Auto closing in 3 seconds..." << reset;
-				Sleep(3000);
-				exit(0);
-			}
-			else
-			{
-				cout << red << "[-] Auto closing in 3 seconds..." << reset;
-				Sleep(3000);
-				exit(0);
-			}
-
-		}
-
-		else
-		{
-			cout << red << "[-] Auto closing in 3 seconds..." << reset;
-			Sleep(3000);
-			exit(0);
-		}
-
-	}
-
-	if (option == option3)
-	{
-		string check;
-		string yes = "Y";
-		string yes3 = "y";
-		string yes2 = "yes";
-		string yes4 = "Yes";
-		cout << red << "\n[-] We're sorry, but this is not available on your current version (" << reset << pink << "Version " << version << reset << red << ")." << reset << yellow << "\n[/] This feature may be available in later versions (" << light_blue << "Version " << version + 0.1 << " or higher" << yellow << ")." << reset;
-		cout << light_yellow << "\n\n[?] Want to check if updates are available? (Y/N) -> " << reset;
-		cin >> check;
-
-		if (check == yes || check == yes2 || check == yes3 || check == yes4)
-		{
 
 
+
+			const int titleLength = 40;
+
+			// Start the console title update loop in a separate thread
+			std::thread titleUpdater(updateConsoleTitle, titleLength);
+
+
+			// Resize console to 800x600
+			resizeConsole(800, 400);
+
+
+
+			system("cls");
+
+
+			const std::string black = "\033[30m";
+			const std::string red = "\033[31m";
+			const std::string green = "\033[32m";
+			const std::string yellow = "\033[33m";
+			const std::string blue = "\033[34m";
+			const std::string magenta = "\033[35m";
+			const std::string cyan = "\033[36m";
+			const std::string white = "\033[37m";
+
+			const std::string bright_black = "\033[90m";
+			const std::string bright_red = "\033[91m";
+			const std::string bright_green = "\033[92m";
+			const std::string bright_yellow = "\033[93m";
+			const std::string bright_blue = "\033[94m";
+			const std::string bright_magenta = "\033[95m";
+			const std::string bright_cyan = "\033[96m";
+			const std::string bright_white = "\033[97m";
+
+			const std::string bg_black = "\033[40m";
+			const std::string bg_red = "\033[41m";
+			const std::string bg_green = "\033[42m";
+			const std::string bg_yellow = "\033[43m";
+			const std::string bg_blue = "\033[44m";
+			const std::string bg_magenta = "\033[45m";
+			const std::string bg_cyan = "\033[46m";
+			const std::string bg_white = "\033[47m";
+
+			const std::string bg_bright_black = "\033[100m";
+			const std::string bg_bright_red = "\033[101m";
+			const std::string bg_bright_green = "\033[102m";
+			const std::string bg_bright_yellow = "\033[103m";
+			const std::string bg_bright_blue = "\033[104m";
+			const std::string bg_bright_magenta = "\033[105m";
+			const std::string bg_bright_cyan = "\033[106m";
+			const std::string bg_bright_white = "\033[107m";
+
+			const std::string light_yellow = "\033[93m"; // Light yellow
+			const std::string light_blue = "\033[96m"; // Light blue
+			const std::string pink = "\033[95m";
+
+			const std::string reset = "\033[0m";
+
+
+
+			cout << red << "[!] A stable internet connection is required for this." << reset;
+			Sleep(1500);
+			system("cls");
+
+			double version = 1.2; // Use double for version to match remote version type
+			bool update = true;
 
 			// URL of the text file containing the latest version number
 			std::string versionUrl = "https://fn-instant-performance-mode.netlify.app/version.txt";
-
+			std::string hashUrl = "https://fn-instant-performance-mode.netlify.app/hash.txt";
 
 			// Perform HTTP GET request to retrieve version number from the URL
 			std::string remoteVersionStr = httpGet(versionUrl);
@@ -726,16 +514,27 @@ int main()
 			//Check if the local version matches the remote version
 			if (version == remoteVersion) {
 				std::cout << green << "[+] You are on the latest version (" << reset << pink << "v." << remoteVersion << reset << green << ")." << reset << std::endl;
-				cout << magenta << "\n[!] It is possible that there are some hotfixes on the server without version changes.\n[?] Do you want to download the latest version (Y/N) -> ";
+			}
+			else {
 
-				string instupdate;
+				/*int msgboxID = MessageBox(
+					NULL,
+					(LPCWSTR)L"You are using an outdated version of the program.\nWe recommend using the built-in automatic updater.",
+					(LPCWSTR)L"Outdated Version",
+					MB_ICONWARNING | MB_OK | MB_DEFBUTTON2
+				); */
+
+				std::cout << red << "\n[!] You are using an outdated version of the program." << reset;
+
+				string check;
 				string yes = "Y";
 				string yes3 = "y";
 				string yes2 = "yes";
 				string yes4 = "Yes";
-				cin >> instupdate;
+				cout << light_yellow << "\n\n[?] Would you like to try the latest version (Y/N) -> " << reset;
+				cin >> check;
 
-				if (instupdate == yes || instupdate == yes2 || instupdate == yes3 || instupdate == yes4)
+				if (check == yes || check == yes2 || check == yes3 || check == yes4)
 				{
 					// Simulated KeyAuth response and app_data for demonstration
 					std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
@@ -746,9 +545,223 @@ int main()
 					if (!downloadLink.empty()) {
 						auto_update(downloadLink);
 					}
+				}
+				else
+				{
 					cout << red << "[-] Auto closing in 3 seconds..." << reset;
 					Sleep(3000);
 					exit(0);
+				}
+
+			}
+
+			// Perform HTTP GET request to retrieve the allowed hash from the URL
+			std::string remoteHash = httpGet(hashUrl);
+
+			if (remoteHash.empty()) {
+				std::cerr << "Failed to fetch remote hash." << std::endl;
+				return 1;
+			}
+
+			// Trim any extraneous whitespace or newlines from the remote hash
+			remoteHash = trim(remoteHash);
+
+			// Get the path of the current executable
+			std::string executablePath = getExecutablePath();
+
+			// Compute the hash of the local executable
+			std::string localHash = computeFileHash(executablePath);
+
+			if (localHash.empty()) {
+				std::cerr << "Failed to compute local hash." << std::endl;
+				return 1;
+			}
+
+			// Convert both hashes to lowercase for comparison
+			std::transform(remoteHash.begin(), remoteHash.end(), remoteHash.begin(), ::tolower);
+			std::transform(localHash.begin(), localHash.end(), localHash.begin(), ::tolower);
+
+			// Compare the local hash with the remote hash
+			if (localHash == remoteHash) {
+				std::cout << green << "[+] Local hash matches remote hash.\n" << reset << std::endl;
+				cout << pink << "[1] Performance mode\n" << reset << bright_blue << "[2] DirectX 11\n" << reset << light_blue << "[3] DirectX 12\n" << reset << yellow << "[4] Update\n" << reset << green << "[5] Exit\n\n" << reset << light_yellow << "Option -> " << reset;
+			}
+			else {
+				std::cout << red << "[!] Local hash does not match remote hash!" << reset << std::endl;
+
+
+				cout << pink << "\n\n[1] Performance mode\n" << reset << bright_blue << "[2] DirectX 11\n" << reset << light_blue << "[3] DirectX 12\n" << reset;
+				cout << red << "[4] Update (recommended)\n" << reset << green << "[5] Exit\n\n" << reset << light_yellow << "Option -> " << reset;
+
+			}
+
+			int option;
+			int option1 = 1;
+			int option2 = 2;
+			int option3 = 3;
+			int option4 = 4;
+			int option5 = 5;
+
+			
+			cin >> option;
+
+			if (option == option1)
+			{
+				// Path of the directory to create
+				const wchar_t* path = L"C:\\Content";
+
+				// Create the directory
+				if (CreateDirectory(path, NULL) || ERROR_ALREADY_EXISTS == GetLastError()) {
+					//std::wcout << L"Directory created successfully: " << path << std::endl;
+				}
+				else {
+					std::cerr << red << "[-] Failed to create directory: " << path << std::endl;
+				}
+
+				std::wstring url;
+				std::wstring filePath = L"C:\\Content\\performance_mode.zip";
+				std::cout << yellow << "\n[-] Downloading content, please wait...\n\n" << reset;
+
+				url = L"https://fn-instant-performance-mode.netlify.app/FortniteGame.zip";
+				if (DownloadFile(url, filePath)) {
+					system("START /MIN /WAIT powershell -windowstyle hidden Expand-Archive -LiteralPath 'C:\\Content\\performance_mode.zip' -DestinationPath '%localappdata%\\FortniteGame'");
+				}
+				else {
+					std::cerr << red << "[-] Failed to download the file." << reset << std::endl;
+				}
+
+				cout << yellow << "[-] Cleaning up...\n" << reset;
+				system("del C:\\Content\\performance_mode.zip");
+				system("rmdir /q C:\\Content\\");
+				cout << green << "\n[+] Finished" << reset << endl;
+				cout << bright_blue << "[+] Auto closing in 3 seconds..." << reset;
+				Sleep(3000);
+				exit(0);
+
+			}
+
+			if (option == option2)
+			{
+				string check;
+				string yes = "Y";
+				string yes3 = "y";
+				string yes2 = "yes";
+				string yes4 = "Yes";
+				cout << red << "\n[-] We're sorry, but this is not available on your current version (" << reset << pink << "Version " << version << reset << red << ")." << reset << yellow << "\n[/] This feature may be available in later versions (" << light_blue << "Version " << version + 0.1 << " or higher" << yellow << ")." << reset;
+				cout << light_yellow << "\n\n[?] Want to check if updates are available? (Y/N) -> " << reset;
+				cin >> check;
+
+				if (check == yes || check == yes2 || check == yes3 || check == yes4)
+				{
+
+
+
+					// URL of the text file containing the latest version number
+					std::string versionUrl = "https://fn-instant-performance-mode.netlify.app/version.txt";
+
+
+					// Perform HTTP GET request to retrieve version number from the URL
+					std::string remoteVersionStr = httpGet(versionUrl);
+
+					if (remoteVersionStr.empty()) {
+						std::cerr << red << "[!] Failed to fetch remote version number." << reset << std::endl;
+						return 1;
+					}
+
+					// Parse the version number from the response
+					double remoteVersion;
+					std::istringstream iss(remoteVersionStr);
+					if (!(iss >> remoteVersion)) {
+						std::cerr << red << "[!] Failed to parse remote version number." << reset << std::endl;
+						return 1;
+					}
+					// Compare local version with remote version
+					if (version >= remoteVersion) {
+						update = false;
+					}
+					else {
+						update = true;
+					}
+
+					//Check if the local version matches the remote version
+					if (version == remoteVersion) {
+						std::cout << green << "[+] You are on the latest version (" << reset << pink << "v." << remoteVersion << reset << green << ")." << reset << std::endl;
+						cout << magenta << "\n[!] It is possible that there are some hotfixes on the server without version changes.\n[?] Do you want to download the latest version (Y/N) -> ";
+
+						string instupdate;
+						string yes = "Y";
+						string yes3 = "y";
+						string yes2 = "yes";
+						string yes4 = "Yes";
+						cin >> instupdate;
+
+						if (instupdate == yes || instupdate == yes2 || instupdate == yes3 || instupdate == yes4)
+						{
+							// Simulated KeyAuth response and app_data for demonstration
+							std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
+
+							std::cout << yellow << "\n[/] Downloading update.." << std::endl;
+							std::cout << green << "[/] New file will be opened shortly.." << std::endl;
+
+							if (!downloadLink.empty()) {
+								auto_update(downloadLink);
+							}
+							cout << red << "[-] Auto closing in 3 seconds..." << reset;
+							Sleep(3000);
+							exit(0);
+						}
+
+						else
+						{
+							cout << red << "[-] Auto closing in 3 seconds..." << reset;
+							Sleep(3000);
+							exit(0);
+						}
+
+					}
+
+				}
+				if (update == true) {
+
+					/*int msgboxID = MessageBox(
+						NULL,
+						(LPCWSTR)L"You are using an outdated version of the program.\nWe recommend using the built-in automatic updater.",
+						(LPCWSTR)L"Outdated Version",
+						MB_ICONWARNING | MB_OK | MB_DEFBUTTON2
+					); */
+
+					std::cout << red << "\n[!] You are using an outdated version of the program." << reset;
+
+					string check;
+					string yes = "Y";
+					string yes3 = "y";
+					string yes2 = "yes";
+					string yes4 = "Yes";
+					cout << yellow << "\n\n[?] Would you like to try the latest version (Y/N) -> " << reset;
+					cin >> check;
+
+					if (check == yes || check == yes2 || check == yes3 || check == yes4)
+					{
+						// Simulated KeyAuth response and app_data for demonstration
+						std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
+
+						std::cout << yellow << "\n[/] Downloading update.." << std::endl;
+						std::cout << green << "[/] New file will be opened shortly.." << std::endl;
+
+						if (!downloadLink.empty()) {
+							auto_update(downloadLink);
+						}
+						cout << red << "[-] Auto closing in 3 seconds..." << reset;
+						Sleep(3000);
+						exit(0);
+					}
+					else
+					{
+						cout << red << "[-] Auto closing in 3 seconds..." << reset;
+						Sleep(3000);
+						exit(0);
+					}
+
 				}
 
 				else
@@ -760,145 +773,166 @@ int main()
 
 			}
 
-		}
-		if (update == true) {
-
-			/*int msgboxID = MessageBox(
-				NULL,
-				(LPCWSTR)L"You are using an outdated version of the program.\nWe recommend using the built-in automatic updater.",
-				(LPCWSTR)L"Outdated Version",
-				MB_ICONWARNING | MB_OK | MB_DEFBUTTON2
-			); */
-
-			std::cout << red << "\n[!] You are using an outdated version of the program." << reset;
-
-			string check;
-			string yes = "Y";
-			string yes3 = "y";
-			string yes2 = "yes";
-			string yes4 = "Yes";
-			cout << yellow << "\n\n[?] Would you like to try the latest version (Y/N) -> " << reset;
-			cin >> check;
-
-			if (check == yes || check == yes2 || check == yes3 || check == yes4)
+			if (option == option3)
 			{
-				// Simulated KeyAuth response and app_data for demonstration
-				std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
+				string check;
+				string yes = "Y";
+				string yes3 = "y";
+				string yes2 = "yes";
+				string yes4 = "Yes";
+				cout << red << "\n[-] We're sorry, but this is not available on your current version (" << reset << pink << "Version " << version << reset << red << ")." << reset << yellow << "\n[/] This feature may be available in later versions (" << light_blue << "Version " << version + 0.1 << " or higher" << yellow << ")." << reset;
+				cout << light_yellow << "\n\n[?] Want to check if updates are available? (Y/N) -> " << reset;
+				cin >> check;
 
-				std::cout << yellow << "\n[/] Downloading update.." << std::endl;
-				std::cout << green << "[/] New file will be opened shortly.." << std::endl;
+				if (check == yes || check == yes2 || check == yes3 || check == yes4)
+				{
 
-				if (!downloadLink.empty()) {
-					auto_update(downloadLink);
+
+
+					// URL of the text file containing the latest version number
+					std::string versionUrl = "https://fn-instant-performance-mode.netlify.app/version.txt";
+
+
+					// Perform HTTP GET request to retrieve version number from the URL
+					std::string remoteVersionStr = httpGet(versionUrl);
+
+					if (remoteVersionStr.empty()) {
+						std::cerr << red << "[!] Failed to fetch remote version number." << reset << std::endl;
+						return 1;
+					}
+
+					// Parse the version number from the response
+					double remoteVersion;
+					std::istringstream iss(remoteVersionStr);
+					if (!(iss >> remoteVersion)) {
+						std::cerr << red << "[!] Failed to parse remote version number." << reset << std::endl;
+						return 1;
+					}
+					// Compare local version with remote version
+					if (version >= remoteVersion) {
+						update = false;
+					}
+					else {
+						update = true;
+					}
+
+					//Check if the local version matches the remote version
+					if (version == remoteVersion) {
+						std::cout << green << "[+] You are on the latest version (" << reset << pink << "v." << remoteVersion << reset << green << ")." << reset << std::endl;
+						cout << magenta << "\n[!] It is possible that there are some hotfixes on the server without version changes.\n[?] Do you want to download the latest version (Y/N) -> ";
+
+						string instupdate;
+						string yes = "Y";
+						string yes3 = "y";
+						string yes2 = "yes";
+						string yes4 = "Yes";
+						cin >> instupdate;
+
+						if (instupdate == yes || instupdate == yes2 || instupdate == yes3 || instupdate == yes4)
+						{
+							// Simulated KeyAuth response and app_data for demonstration
+							std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
+
+							std::cout << yellow << "\n[/] Downloading update.." << std::endl;
+							std::cout << green << "[/] New file will be opened shortly.." << std::endl;
+
+							if (!downloadLink.empty()) {
+								auto_update(downloadLink);
+							}
+							cout << red << "[-] Auto closing in 3 seconds..." << reset;
+							Sleep(3000);
+							exit(0);
+						}
+
+						else
+						{
+							cout << red << "[-] Auto closing in 3 seconds..." << reset;
+							Sleep(3000);
+							exit(0);
+						}
+
+					}
+
 				}
-				cout << red << "[-] Auto closing in 3 seconds..." << reset;
-				Sleep(3000);
+				if (update == true) {
+
+					/*int msgboxID = MessageBox(
+						NULL,
+						(LPCWSTR)L"You are using an outdated version of the program.\nWe recommend using the built-in automatic updater.",
+						(LPCWSTR)L"Outdated Version",
+						MB_ICONWARNING | MB_OK | MB_DEFBUTTON2
+					); */
+
+					std::cout << red << "\n[!] You are using an outdated version of the program." << reset;
+
+					string check;
+					string yes = "Y";
+					string yes3 = "y";
+					string yes2 = "yes";
+					string yes4 = "Yes";
+					cout << yellow << "\n\n[?] Would you like to try the latest version (Y/N) -> " << reset;
+					cin >> check;
+
+					if (check == yes || check == yes2 || check == yes3 || check == yes4)
+					{
+						// Simulated KeyAuth response and app_data for demonstration
+						std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
+
+						std::cout << yellow << "\n[/] Downloading update.." << std::endl;
+						std::cout << green << "[/] New file will be opened shortly.." << std::endl;
+
+						if (!downloadLink.empty()) {
+							auto_update(downloadLink);
+						}
+						cout << red << "[-] Auto closing in 3 seconds..." << reset;
+						Sleep(3000);
+						exit(0);
+					}
+					else
+					{
+						cout << red << "[-] Auto closing in 3 seconds..." << reset;
+						Sleep(3000);
+						exit(0);
+					}
+
+				}
+
+				else
+				{
+					cout << red << "[-] Auto closing in 3 seconds..." << reset;
+					Sleep(3000);
+					exit(0);
+				}
+
+
+			}
+
+			if (option == option4)
+			{
+						std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
+
+						std::cout << yellow << "\n[/] Downloading update.." << std::endl;
+						std::cout << green << "[/] New file will be opened shortly.." << std::endl;
+
+						if (!downloadLink.empty()) {
+							auto_update(downloadLink);
+						}
+
+			}
+
+			if (option == option5)
+			{
+				cout << yellow << "\n[+] We're sorry to see you go! Hopefully we'll see each other again soon!";
+				Sleep(0500);
 				exit(0);
 			}
+
 			else
 			{
-				cout << red << "[-] Auto closing in 3 seconds..." << reset;
-				Sleep(3000);
+				cout << red << "\n[-] Failure: Invalid Selection";
+				Sleep(1500);
 				exit(0);
 			}
 
-		}
 
-		else
-		{
-			cout << red << "[-] Auto closing in 3 seconds..." << reset;
-			Sleep(3000);
-			exit(0);
-		}
-
-
-	}
-
-	if (option == option4)
-	{
-		// URL of the text file containing the latest version number
-		std::string versionUrl = "https://fn-instant-performance-mode.netlify.app/version.txt";
-
-		// Perform HTTP GET request to retrieve version number from the URL
-		std::string remoteVersionStr = httpGet(versionUrl);
-
-		if (remoteVersionStr.empty()) {
-			std::cerr << red << "[!] Failed to fetch remote version number." << reset << std::endl;
-			return 1;
-		}
-
-		// Parse the version number from the response
-		double remoteVersion;
-		std::istringstream iss(remoteVersionStr);
-		if (!(iss >> remoteVersion)) {
-			std::cerr << red << "[!] Failed to parse remote version number." << reset << std::endl;
-			return 1;
-		}
-		// Compare local version with remote version
-		if (version >= remoteVersion) {
-			update = false;
-		}
-		else {
-			update = true;
-		}
-
-		//Check if the local version matches the remote version
-		if (version == remoteVersion) {
-			std::cout << green << "[+] You are on the latest version (" << reset << pink << "v." << remoteVersion << reset << green << ")." << reset << std::endl;
-			Sleep(3000);
-			exit(0);
-		}
-		else {
-
-			/*int msgboxID = MessageBox(
-				NULL,
-				(LPCWSTR)L"You are using an outdated version of the program.\nWe recommend using the built-in automatic updater.",
-				(LPCWSTR)L"Outdated Version",
-				MB_ICONWARNING | MB_OK | MB_DEFBUTTON2
-			); */
-
-			std::cout << red << "\n[!] You are using an outdated version of the program." << reset;
-
-			string check;
-			string yes = "Y";
-			string yes3 = "y";
-			string yes2 = "yes";
-			string yes4 = "Yes";
-			cout << light_yellow << "\n\n[?] Would you like to try the latest version (Y/N) -> " << reset;
-			cin >> check;
-
-			if (check == yes || check == yes2 || check == yes3 || check == yes4)
-			{
-				// Simulated KeyAuth response and app_data for demonstration
-				std::string downloadLink = "https://fn-instant-performance-mode.netlify.app/fn-instant-performance-mode.exe";
-
-				std::cout << yellow << "\n[/] Downloading update.." << std::endl;
-				std::cout << green << "[/] New file will be opened shortly.." << std::endl;
-
-				if (!downloadLink.empty()) {
-					auto_update(downloadLink);
-				}
-			}
-			else
-			{
-				cout << red << "[-] Auto closing in 3 seconds..." << reset;
-				Sleep(3000);
-				exit(0);
-			}
-		}
-	}
-
-	if (option == option5)
-	{
-		cout << yellow << "\n[+] We're sorry to see you go! Hopefully we'll see each other again soon!";
-		Sleep(0500);
-		exit(0);
-	}
-
-	else
-	{
-		cout << red << "\n[-] Failure: Invalid Selection";
-		Sleep(1500);
-		exit(0);
-	}
 }
