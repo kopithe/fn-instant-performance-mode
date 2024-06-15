@@ -10,7 +10,7 @@ A powerful Fortnite C++ tool that allows users to launch Fortnite using Performa
 ## 🛠️ Explanation
 
 - 🚀 **Dynamic Console Title**: Uses a randomly generated console title that changes every 0.25 seconds.
-- 🔄 **Automatic Updater**: Checks the software version against a server-hosted version (e.g., using [netlify.app](https://www.netlify.com/)). Notifies the user if an update is available.
+- 🔄 **Automatic Updater**: Checks the software version against a server-hosted version (e.g. using [netlify.app](https://www.netlify.com/)). Notifies the user if an update is available.
 - 🎮 **Graphics Mode Selection**: Allows users to choose between Performance Mode and DirectX 11. Downloads necessary files and configures settings to optimize gameplay.
 - 🧹 **Cleanup**: Automatically deletes all temporary files and folders after configuration.
 
