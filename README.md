@@ -28,13 +28,15 @@ A powerful Fortnite C++ tool that allows users to launch Fortnite using Performa
 - 🆕 **New Feature**: Added a server-side hash checker that verifies the integrity of the user's files.
 ![Screenshot 2024-06-15 103158](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/535aaa11-abd4-433a-8313-a75aec59720c)
 ![Screenshot 2024-06-15 103238](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/da246de0-8a62-4e15-bb3c-dec529bf27bc)
-
-
-
-### How to Use
-
+#### 📜 How to Use
 Open a PowerShell terminal and type `Get-FileHash` followed by the path of the executable. To get the path, you can drag and drop the executable into the PowerShell terminal.
 Example: `Get-FileHash C:\Source\example.exe`.
+
+### 📜 View Changelogs
+- 🆕 **New Feature**: Added a server-side option to view the `Change Logs`.
+  ![Screenshot 2024-06-16 004953](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/100145a3-492a-4a6d-8327-f94131ca9529)
+
+
 
 ## 📈 Updates
 
@@ -45,7 +47,7 @@ Fortnite updates often change the trailers. I'll keep this tool updated to match
 - 🆕 Add multiple choices for different performance modes (e.g., 160FPS and 240FPS options).
 - 🆕 Add DirectX 11 and DirectX 12 support.
 - 🛡️ Add an anti-debugger to detect HTTP debuggers.
-- ✔️ ~~Make the PowerShell extraction command invisible to the user or run in the background~~ (Almost finished).
+- ✔️ ~~Make the PowerShell extraction command invisible to the user or run in the background.~~
 
 ## 🚀 Usage
 
