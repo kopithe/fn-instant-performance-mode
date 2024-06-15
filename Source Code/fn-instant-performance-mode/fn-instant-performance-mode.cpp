@@ -590,7 +590,7 @@ int main()
 				std::cout << red << "[!] Local hash does not match remote hash!" << reset << std::endl;
 
 
-				cout << pink << "\n\n[1] Performance mode\n" << reset << bright_blue << "[2] DirectX 11\n" << reset << light_blue << "[3] DirectX 12\n" << reset;
+				cout << pink << "\n[1] Performance mode\n" << reset << bright_blue << "[2] DirectX 11\n" << reset << light_blue << "[3] DirectX 12\n" << reset;
 				cout << red << "[4] Update (recommended)\n" << reset << green << "[5] Exit\n\n" << reset << light_yellow << "Option -> " << reset;
 
 			}
@@ -602,7 +602,6 @@ int main()
 			int option4 = 4;
 			int option5 = 5;
 
-			
 			cin >> option;
 
 			if (option == option1)
@@ -933,6 +932,5 @@ int main()
 				Sleep(1500);
 				exit(0);
 			}
-
 
 }
