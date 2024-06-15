@@ -16,6 +16,13 @@ A Fortnite C++ tool that allows the user to use Performance Mode/DirectX 11 inst
   
 ![Screenshot 2024-06-15 013516](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/68ee292e-a705-4d8c-9cca-da7a9dc0857f)
 
+# Updates
+As Fortnite makes updates that also change the trailers, I will try to keep updating this to the latest game patch!
+
+# To-do list
+- Add multiple choice for the different modes to make it more complex (e.g. giving the user a choice between the 160FPS and 240FPS performance modes)
+- Add an anti-debugger to detect e.g. HTTP debugger (can be used to bypass the automatic updater, which is extremely easy)
+
 # Usage
 To use it or adapt it to your needs, you must change the version and download URL(s).
 
