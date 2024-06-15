@@ -16,6 +16,13 @@ A Fortnite C++ tool that allows the user to use Performance Mode/DirectX 11 inst
   
 ![Screenshot 2024-06-15 013516](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/68ee292e-a705-4d8c-9cca-da7a9dc0857f)
 
+# Changelogs
+## Hash Checker
+- Added a server-side hash checker that compares the user's hash with the one on the server
+![Screenshot 2024-06-15 090308](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/7e45a37f-38d8-41f3-9f89-cc6711f8ceb2)
+![Screenshot 2024-06-15 090253](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/021298a5-52aa-4c2a-bd0a-e3fa2b90c926)
+
+
 # Updates
 As Fortnite makes updates that also change the trailers, I will try to keep updating this to the latest game patch!
 
