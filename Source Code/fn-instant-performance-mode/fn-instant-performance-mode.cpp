@@ -413,11 +413,140 @@ bool isSoftwareBlacklisted() {
 	return blacklisted;
 }
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <Windows.h>
+#include <WinINet.h>
+const std::string changelogUrl = "https://fn-instant-performance-mode.netlify.app/changelog.txt";
+const std::string changelogFilePath = "C:\\Temp\\changelog.txt";
+bool fetchChangelog() {
+	HINTERNET hInternet = InternetOpenA("FetchChangelog", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+	if (hInternet == NULL) {
+		std::cerr << "Failed to initialize WinINet." << std::endl;
+		return false;
+	}
+
+	HINTERNET hUrl = InternetOpenUrlA(hInternet, changelogUrl.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
+	if (hUrl == NULL) {
+		std::cerr << "Failed to open URL." << std::endl;
+		InternetCloseHandle(hInternet);
+		return false;
+	}
+
+	std::ofstream file(changelogFilePath, std::ios::out);
+	if (!file.is_open()) {
+		std::cerr << "Failed to create file." << std::endl;
+		InternetCloseHandle(hUrl);
+		InternetCloseHandle(hInternet);
+		return false;
+	}
+
+	char buffer[1024];
+	DWORD bytesRead = 0;
+	while (InternetReadFile(hUrl, buffer, sizeof(buffer), &bytesRead) && bytesRead > 0) {
+		file.write(buffer, bytesRead);
+	}
+
+	file.close();
+	InternetCloseHandle(hUrl);
+	InternetCloseHandle(hInternet);
+	return true;
+}
+
+const std::string black = "\033[30m";
+const std::string red = "\033[31m";
+const std::string green = "\033[32m";
+const std::string yellow = "\033[33m";
+const std::string blue = "\033[34m";
+const std::string magenta = "\033[35m";
+const std::string cyan = "\033[36m";
+const std::string white = "\033[37m";
+
+const std::string bright_black = "\033[90m";
+const std::string bright_red = "\033[91m";
+const std::string bright_green = "\033[92m";
+const std::string bright_yellow = "\033[93m";
+const std::string bright_blue = "\033[94m";
+const std::string bright_magenta = "\033[95m";
+const std::string bright_cyan = "\033[96m";
+const std::string bright_white = "\033[97m";
+
+const std::string bg_black = "\033[40m";
+const std::string bg_red = "\033[41m";
+const std::string bg_green = "\033[42m";
+const std::string bg_yellow = "\033[43m";
+const std::string bg_blue = "\033[44m";
+const std::string bg_magenta = "\033[45m";
+const std::string bg_cyan = "\033[46m";
+const std::string bg_white = "\033[47m";
+
+const std::string bg_bright_black = "\033[100m";
+const std::string bg_bright_red = "\033[101m";
+const std::string bg_bright_green = "\033[102m";
+const std::string bg_bright_yellow = "\033[103m";
+const std::string bg_bright_blue = "\033[104m";
+const std::string bg_bright_magenta = "\033[105m";
+const std::string bg_bright_cyan = "\033[106m";
+const std::string bg_bright_white = "\033[107m";
+
+const std::string light_yellow = "\033[93m"; // Light yellow
+const std::string light_blue = "\033[96m"; // Light blue
+const std::string pink = "\033[95m";
+
+const std::string reset = "\033[0m";
+
+void viewChangelogs() {
+	std::string changelogUrl = "https://fn-instant-performance-mode.netlify.app/changelog.txt";
+	std::string changelogContent = httpGet(changelogUrl);
+
+	if (changelogContent.empty()) {
+		std::cerr << "[!] Failed to fetch changelog." << std::endl;
+	}
+	else {
+		std::cout << "\n--- Changelog ---\n";
+
+		std::istringstream iss(changelogContent);
+		std::string line;
+		while (std::getline(iss, line)) {
+			if (line.empty()) {
+				continue; // Skip empty lines
+			}
+
+			char prefix = line[0];
+			const std::string* color = &reset; // Default color
+
+			switch (prefix) {
+			case '+':
+				color = &green;
+				break;
+			case '-':
+				color = &red;
+				break;
+			case '?':
+				color = &yellow;
+				break;
+			case 'V':
+				color = &pink;
+				break;
+			default:
+				break;
+			}
+
+			std::cout << *color << line << reset << std::endl;
+		}
+
+		std::cout << "-----------------\n";
+	}
+}
+
 
 int main()
 {
 
 
+	cool:
 
 			const int titleLength = 40;
 
@@ -433,55 +562,13 @@ int main()
 			system("cls");
 
 
-			const std::string black = "\033[30m";
-			const std::string red = "\033[31m";
-			const std::string green = "\033[32m";
-			const std::string yellow = "\033[33m";
-			const std::string blue = "\033[34m";
-			const std::string magenta = "\033[35m";
-			const std::string cyan = "\033[36m";
-			const std::string white = "\033[37m";
-
-			const std::string bright_black = "\033[90m";
-			const std::string bright_red = "\033[91m";
-			const std::string bright_green = "\033[92m";
-			const std::string bright_yellow = "\033[93m";
-			const std::string bright_blue = "\033[94m";
-			const std::string bright_magenta = "\033[95m";
-			const std::string bright_cyan = "\033[96m";
-			const std::string bright_white = "\033[97m";
-
-			const std::string bg_black = "\033[40m";
-			const std::string bg_red = "\033[41m";
-			const std::string bg_green = "\033[42m";
-			const std::string bg_yellow = "\033[43m";
-			const std::string bg_blue = "\033[44m";
-			const std::string bg_magenta = "\033[45m";
-			const std::string bg_cyan = "\033[46m";
-			const std::string bg_white = "\033[47m";
-
-			const std::string bg_bright_black = "\033[100m";
-			const std::string bg_bright_red = "\033[101m";
-			const std::string bg_bright_green = "\033[102m";
-			const std::string bg_bright_yellow = "\033[103m";
-			const std::string bg_bright_blue = "\033[104m";
-			const std::string bg_bright_magenta = "\033[105m";
-			const std::string bg_bright_cyan = "\033[106m";
-			const std::string bg_bright_white = "\033[107m";
-
-			const std::string light_yellow = "\033[93m"; // Light yellow
-			const std::string light_blue = "\033[96m"; // Light blue
-			const std::string pink = "\033[95m";
-
-			const std::string reset = "\033[0m";
-
 
 
 			cout << red << "[!] A stable internet connection is required for this." << reset;
 			Sleep(1500);
 			system("cls");
 
-			double version = 1.2; // Use double for version to match remote version type
+			double version = 1.3; // Use double for version to match remote version type
 			bool update = true;
 
 			// URL of the text file containing the latest version number
@@ -584,14 +671,14 @@ int main()
 			// Compare the local hash with the remote hash
 			if (localHash == remoteHash) {
 				std::cout << green << "[+] Local hash matches remote hash.\n" << reset << std::endl;
-				cout << pink << "[1] Performance mode\n" << reset << bright_blue << "[2] DirectX 11\n" << reset << light_blue << "[3] DirectX 12\n" << reset << yellow << "[4] Update\n" << reset << green << "[5] Exit\n\n" << reset << light_yellow << "Option -> " << reset;
+				cout << pink << "[1] Performance mode\n" << reset << bright_blue << "[2] DirectX 11\n" << reset << light_blue << "[3] DirectX 12\n" << reset << yellow << "[4] Update\n" << reset << green << "[5] View Changelogs\n" << reset << pink << "[6] Exit\n\n" << reset << light_yellow << "Option -> " << reset;
 			}
 			else {
 				std::cout << red << "[!] Local hash does not match remote hash!" << reset << std::endl;
 
 
 				cout << pink << "\n[1] Performance mode\n" << reset << bright_blue << "[2] DirectX 11\n" << reset << light_blue << "[3] DirectX 12\n" << reset;
-				cout << red << "[4] Update (recommended)\n" << reset << green << "[5] Exit\n\n" << reset << light_yellow << "Option -> " << reset;
+				cout << red << "[4] Update (recommended)\n" << reset << green << "[5] View Changelogs\n" << reset << pink << "[6] Exit\n\n" << reset << light_yellow << "Option -> " << reset;
 
 			}
 
@@ -601,6 +688,7 @@ int main()
 			int option3 = 3;
 			int option4 = 4;
 			int option5 = 5;
+			int option6 = 6;
 
 			cin >> option;
 
@@ -916,11 +1004,18 @@ int main()
 						if (!downloadLink.empty()) {
 							auto_update(downloadLink);
 						}
-
 			}
 
 			if (option == option5)
 			{
+				resizeConsole(800, 800);
+				viewChangelogs();
+				cout << bright_yellow << "\n\nPress any key to exit -> " << reset;
+				system("pause >nul");
+				exit(0);
+			}
+
+			if (option == 6) {
 				cout << yellow << "\n[+] We're sorry to see you go! Hopefully we'll see each other again soon!";
 				Sleep(0500);
 				exit(0);
