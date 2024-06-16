@@ -1,6 +1,7 @@
 # 🌟 fn-instant-performance-mode 🌟
+![Screenshot 2024-06-16 094156](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/93c60739-87e3-4579-8ad3-121ff0c16bd6)
 
-![Screenshot 2024-06-15 103700](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/5538455e-46e4-4205-91ef-d0258b1b9d06)
+
 
 ![ezgif-3-98d97c518c](https://github.com/kopithe/fn-instant-performance-mode/assets/166122699/bd4b4518-b7a2-43e1-9eff-baa9d81c60cd)
 
