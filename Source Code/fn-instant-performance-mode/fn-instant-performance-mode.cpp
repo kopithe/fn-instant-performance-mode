@@ -537,19 +537,6 @@ void viewChangelogs() {
 }
 
 
-struct slowly_printing_string {
-	std::string data;
-	long int delay;
-};
-
-std::ostream& operator<<(std::ostream& out, const slowly_printing_string& s) {
-	for (const auto& c : s.data) {
-		out << c << std::flush;
-		std::this_thread::sleep_for(std::chrono::milliseconds(s.delay));
-	}
-	return out;
-}
-
 int main()
 {
 
@@ -572,11 +559,11 @@ cool:
 
 
 
-	cout << red << slowly_printing_string{ "[!] A stable internet connection is required for this.", 10 } << reset;
+	cout << red << "[!] A stable internet connection is required for this." << reset;
 	Sleep(1500);
 	system("cls");
 
-	double version = 1.4; // Use double for version to match remote version type
+	double version = 1.3; // Use double for version to match remote version type
 	bool update = true;
 
 	// URL of the text file containing the latest version number
@@ -608,7 +595,7 @@ cool:
 
 	//Check if the local version matches the remote version
 	if (version == remoteVersion) {
-		std::cout << green << slowly_printing_string{ "[+] You are on the latest version (", 10 } << reset << pink << slowly_printing_string{ "v.", 50 } << remoteVersion << reset << green << ")." << reset << std::endl;
+		std::cout << green << "[+] You are on the latest version (" << reset << pink << "v." << remoteVersion << reset << green << ")." << reset << std::endl;
 	}
 	else {
 
@@ -678,29 +665,15 @@ cool:
 
 	// Compare the local hash with the remote hash
 	if (localHash == remoteHash) {
-		std::cout << green << slowly_printing_string{ "[+] Local hash matches remote hash.\n", 10 } << reset << std::endl;
-		cout << blue << slowly_printing_string{ "\n[ ", 10 } << reset << slowly_printing_string{ "1", 10 } << blue << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << blue << slowly_printing_string{ "[ ", 10 } << reset << slowly_printing_string{ "Performance mode", 10 } << blue << slowly_printing_string{ " ]", 10 };
-		cout << blue << slowly_printing_string{ "\n[ ", 10 } << reset << slowly_printing_string{ "2", 10 } << blue << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << blue << slowly_printing_string{ "[ ", 10 } << reset << slowly_printing_string{ "DirectX 11", 10 } << blue << slowly_printing_string{ " ]", 10 };
-		cout << blue << slowly_printing_string{ "\n[ ", 10 } << reset << slowly_printing_string{ "3", 10 } << blue << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << blue << slowly_printing_string{ "[ ", 10 } << reset << slowly_printing_string{ "DirectX 12", 10 } << blue << slowly_printing_string{ " ]", 10 };
-		cout << blue << slowly_printing_string{ "\n[ ", 10 } << reset << slowly_printing_string{ "4", 10 } << blue << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << blue << slowly_printing_string{ "[ ", 10 } << reset << slowly_printing_string{ "Update", 10 } << blue << slowly_printing_string{ " ]", 10 };
-		cout << blue << slowly_printing_string{ "\n[ ", 10 } << reset << slowly_printing_string{ "5", 10 } << blue << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << blue << slowly_printing_string{ "[ ", 10 } << reset << slowly_printing_string{ "View Changelogs", 10 } << blue << slowly_printing_string{ " ]", 10 };
-		cout << blue << slowly_printing_string{ "\n[ ", 10 } << reset << slowly_printing_string{ "6", 10 } << blue << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << blue << slowly_printing_string{ "[ ", 10 } << reset << slowly_printing_string{ "Exit", 10 } << blue << slowly_printing_string{ " ]", 10 };
-		cout << light_yellow << slowly_printing_string{ "\n\n[ ", 10 } << reset << slowly_printing_string{ "Option", 10 } << light_yellow << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << reset;
-
+		std::cout << green << "[+] Local hash matches remote hash.\n" << reset << std::endl;
+		cout << pink << "[1] Performance mode\n" << reset << bright_blue << "[2] DirectX 11\n" << reset << light_blue << "[3] DirectX 12\n" << reset << yellow << "[4] Update\n" << reset << green << "[5] View Changelogs\n" << reset << pink << "[6] Exit\n\n" << reset << light_yellow << "Option -> " << reset;
 	}
 	else {
-		std::cout << red << slowly_printing_string{ "[!] Local hash does not match remote hash!", 10 } << reset << std::endl;
-
-		cout << blue << slowly_printing_string{ "\n[ ", 10 } << reset << slowly_printing_string{ "1", 10 } << blue << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << blue << slowly_printing_string{ "[ ", 10 } << reset << slowly_printing_string{ "Performance mode", 10 } << blue << slowly_printing_string{ " ]", 10 };
-		cout << blue << slowly_printing_string{ "\n[ ", 10 } << reset << slowly_printing_string{ "2", 10 } << blue << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << blue << slowly_printing_string{ "[ ", 10 } << reset << slowly_printing_string{ "DirectX 11", 10 } << blue << slowly_printing_string{ " ]", 10 };
-		cout << blue << slowly_printing_string{ "\n[ ", 10 } << reset << slowly_printing_string{ "3", 10 } << blue << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << blue << slowly_printing_string{ "[ ", 10 } << reset << slowly_printing_string{ "DirectX 12", 10 } << blue << slowly_printing_string{ " ]", 10 };
-		cout << blue << slowly_printing_string{ "\n[ ", 10 } << reset << slowly_printing_string{ "4", 10 } << blue << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << blue << slowly_printing_string{ "[ ", 10 } << red << slowly_printing_string{ "Update (recommended)", 10 } << blue << slowly_printing_string{ " ]", 10 };
-		cout << blue << slowly_printing_string{ "\n[ ", 10 } << reset << slowly_printing_string{ "5", 10 } << blue << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << blue << slowly_printing_string{ "[ ", 10 } << reset << slowly_printing_string{ "View Changelogs", 10 } << blue << slowly_printing_string{ " ]", 10 };
-		cout << blue << slowly_printing_string{ "\n[ ", 10 } << reset << slowly_printing_string{ "6", 10 } << blue << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << blue << slowly_printing_string{ "[ ", 10 } << reset << slowly_printing_string{ "Exit", 10 } << blue << slowly_printing_string{ " ]", 10 };
-		cout << light_yellow << slowly_printing_string{ "\n\n[ ", 10 } << reset << slowly_printing_string{ "Option", 10 } << light_yellow << slowly_printing_string{ " ]", 10 } << reset << slowly_printing_string{ " -> ", 10 } << reset;
+		std::cout << red << "[!] Local hash does not match remote hash!" << reset << std::endl;
 
 
-
+		cout << pink << "\n[1] Performance mode\n" << reset << bright_blue << "[2] DirectX 11\n" << reset << light_blue << "[3] DirectX 12\n" << reset;
+		cout << red << "[4] Update (recommended)\n" << reset << green << "[5] View Changelogs\n" << reset << pink << "[6] Exit\n\n" << reset << light_yellow << "Option -> " << reset;
 
 	}
 
